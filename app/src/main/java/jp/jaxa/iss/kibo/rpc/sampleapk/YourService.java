@@ -12,18 +12,61 @@ import org.opencv.core.Mat;
  */
 
 public class YourService extends KiboRpcService {
+    private final MovementService movementService = new MovementService(this.api);
+    private final VisionService visionService = new VisionService(this.api, movementService);
+    private final AreaProcessor areaProcessor = new AreaProcessor(
+            this.api,
+            this.movementService,
+            this.visionService
+    );
+
+    final int MAX_RETRIES = 3;
+    final int RETRY_WAIT_MS = 500;
+
     @Override
     protected void runPlan1(){
-        // The mission starts.
+        // The mission starts
         api.startMission();
 
-        // Move to a point.
-        Point point = new Point(10.9d, -9.92284d, 5.195d);
-        Quaternion quaternion = new Quaternion(0f, 0f, -0.707f, 0.707f);
-        api.moveTo(point, quaternion, false);
+        /* **************************************************** */
+        /* Let's move to each area and recognize the items. */
+        /* **************************************************** */
 
-        // Get a camera image.
-        Mat image = api.getMatNavCam();
+        // Area 1
+        Point area1Point = new Point(11.1d, -10.58d, 5.1d);
+        Quaternion area1Quaternion = new Quaternion(0f, 0f, -0.707f, 0.707f);
+        Mat Area1LostItemImage = areaProcessor.processAreaForArTags(
+                1,
+                area1Point,
+                area1Quaternion
+        );
+
+        // Area 2
+        Point area2Point = new Point(10.5d, -8d, 3.76203d);
+        Quaternion area2Quaternion = new Quaternion(0f, 0f, -0.707f, 0.707f);
+        Mat Area2LostItemImage = areaProcessor.processAreaForArTags(
+                2,
+                area2Point,
+                area2Quaternion
+        );
+
+        // Area 3
+        Point area3Point = new Point(11d, -7d, 3.76203d);
+        Quaternion area3Quaternion = new Quaternion(0f, 0f, -0.707f, 0.707f);
+        Mat Area3LostItemImage = areaProcessor.processAreaForArTags(
+                3,
+                area3Point,
+                area3Quaternion
+        );
+
+        // Area 4
+        Point area4Point = new Point(9.866984d, -6.7d, 5d);
+        Quaternion area4Quaternion = new Quaternion(0f, 0f, -0.707f, 0.707f);
+        Mat Area4LostItemImage = areaProcessor.processAreaForArTags(
+                4,
+                area4Point,
+                area4Quaternion
+        );
 
         /* ******************************************************************************** */
         /* Write your code to recognize the type and number of landmark items in each area! */
@@ -31,16 +74,14 @@ public class YourService extends KiboRpcService {
         /* ******************************************************************************** */
 
         // When you recognize landmark items, let’s set the type and number.
-        api.setAreaInfo(1, "item_name", 1);
+//        api.setAreaInfo(1, "item_name", 1);
 
-        /* **************************************************** */
-        /* Let's move to each area and recognize the items. */
-        /* **************************************************** */
 
-        // When you move to the front of the astronaut, report the rounding completion.
-        point = new Point(11.143d, -6.7607d, 4.9654d);
-        quaternion = new Quaternion(0f, 0f, 0.707f, 0.707f);
-        api.moveTo(point, quaternion, false);
+        // When you move to the front of the astronaut, report the rounding completion
+        Point astronautPoint = new Point(9.866984d, -6.7d, 5d);
+        Quaternion astronautQuaternion = new Quaternion(0f, 0f, -0.707f, 0.707f);
+        movementService.moveToTargetPosition(astronautPoint, astronautQuaternion);
+
         api.reportRoundingCompletion();
 
         /* ********************************************************** */
@@ -48,7 +89,7 @@ public class YourService extends KiboRpcService {
         /* ********************************************************** */
 
         // Let's notify the astronaut when you recognize it.
-        api.notifyRecognitionItem();
+//        api.notifyRecognitionItem();
 
         /* ******************************************************************************************************* */
         /* Write your code to move Astrobee to the location of the target item (what the astronaut is looking for) */
@@ -66,10 +107,5 @@ public class YourService extends KiboRpcService {
     @Override
     protected void runPlan3(){
         // write your plan 3 here.
-    }
-
-    // You can add your method.
-    private String yourMethod(){
-        return "your method";
     }
 }
