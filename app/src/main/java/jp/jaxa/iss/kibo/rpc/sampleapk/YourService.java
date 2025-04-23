@@ -20,9 +20,6 @@ public class YourService extends KiboRpcService {
             this.visionService
     );
 
-    final int MAX_RETRIES = 3;
-    final int RETRY_WAIT_MS = 500;
-
     @Override
     protected void runPlan1(){
         // The mission starts
