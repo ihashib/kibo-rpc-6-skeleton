@@ -12,16 +12,16 @@ import org.opencv.core.Mat;
  */
 
 public class YourService extends KiboRpcService {
-    private final MovementService movementService = new MovementService(this.api);
-    private final VisionService visionService = new VisionService(this.api, movementService);
-    private final AreaProcessor areaProcessor = new AreaProcessor(
-            this.api,
-            this.movementService,
-            this.visionService
-    );
+    private MovementService movementService;
+    private VisionService visionService;
+    private AreaProcessor areaProcessor;
 
     @Override
     protected void runPlan1(){
+        movementService = new MovementService(api);
+        visionService = new VisionService(api, movementService);
+        areaProcessor = new AreaProcessor(api, movementService, visionService);
+
         // The mission starts
         api.startMission();
 
@@ -29,8 +29,17 @@ public class YourService extends KiboRpcService {
         /* Let's move to each area and recognize the items. */
         /* **************************************************** */
 
+        // Move Astrobee from KIZ2 into KIZ1
+        Point kiz1EntryPoint = new Point(10.292d, -10d, 4.6d);
+        Quaternion kiz1EntryQuaternion = new Quaternion(0f, 0f, -0.707f, 0.707f);
+        movementService.moveToTargetPosition(kiz1EntryPoint, kiz1EntryQuaternion);
+
+        Point kiz1Point = new Point(10.7d, -10d, 4.6d);
+        Quaternion kiz1Quaternion = new Quaternion(0f, 0f, -0.707f, 0.707f);
+        movementService.moveToTargetPosition(kiz1Point, kiz1Quaternion);
+
         // Area 1
-        Point area1Point = new Point(11.1d, -10.58d, 5.1d);
+        Point area1Point = new Point(11d, -9.8d, 4.5d);
         Quaternion area1Quaternion = new Quaternion(0f, 0f, -0.707f, 0.707f);
         Mat Area1LostItemImage = areaProcessor.processAreaForArTags(
                 1,
@@ -39,7 +48,7 @@ public class YourService extends KiboRpcService {
         );
 
         // Area 2
-        Point area2Point = new Point(10.5d, -8d, 3.76203d);
+        Point area2Point = new Point(11d, -9.1d, 5.2);
         Quaternion area2Quaternion = new Quaternion(0f, 0f, -0.707f, 0.707f);
         Mat Area2LostItemImage = areaProcessor.processAreaForArTags(
                 2,
@@ -48,7 +57,7 @@ public class YourService extends KiboRpcService {
         );
 
         // Area 3
-        Point area3Point = new Point(11d, -7d, 3.76203d);
+        Point area3Point = new Point(10.7d, -8.1d, 5.2d);
         Quaternion area3Quaternion = new Quaternion(0f, 0f, -0.707f, 0.707f);
         Mat Area3LostItemImage = areaProcessor.processAreaForArTags(
                 3,
@@ -57,7 +66,7 @@ public class YourService extends KiboRpcService {
         );
 
         // Area 4
-        Point area4Point = new Point(9.866984d, -6.7d, 5d);
+        Point area4Point = new Point(11.1, -7d, 4.7d);
         Quaternion area4Quaternion = new Quaternion(0f, 0f, -0.707f, 0.707f);
         Mat Area4LostItemImage = areaProcessor.processAreaForArTags(
                 4,
