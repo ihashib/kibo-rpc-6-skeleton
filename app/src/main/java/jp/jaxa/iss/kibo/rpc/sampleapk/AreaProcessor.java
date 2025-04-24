@@ -91,68 +91,55 @@ public class AreaProcessor {
      * @return the captured NavCam image, or an empty Mat if any step fails
      */
     public Mat getLostItemPlaneNavImage(AreaEnum area) {
-        Log.d("LOST_ITEM_IMAGE", "Attempting to get image of lost item plane: " + area);
-
-        Mat emptyImage = new Mat();
-
-        // Get current position to rotate in place
-        Point currentPosition = api.getRobotKinematics().getPosition();
-
-        if (currentPosition == null) {
-            Log.e("LOST_ITEM_SEARCH", "Failed to get current position");
-            return emptyImage;
-        }
-
-        QuaternionPoint lostItemSearchPlane;
-        if(Constants.LOST_ITEM_SEARCH_PLANE_PER_AREA.containsKey(area)) {
-            lostItemSearchPlane = Constants.LOST_ITEM_SEARCH_PLANE_PER_AREA.get(area);
-        } else {
-            Log.d("LOST_ITEM_SEARCH", "Given Area is not supported");
-
-            return emptyImage;
-        }
-
-        // Move to the lost item position and rotate to the correct orientation
-        boolean moveSuccess = movementService.moveToTargetPosition(
-                lostItemSearchPlane.getPoint(),
-                lostItemSearchPlane.getQuaternion()
-        );
-
-        if (!moveSuccess) {
-            Log.e("LOST_ITEM_SEARCH", "MoveTo failed for area " + area + "  " + lostItemSearchPlane.getPoint());
-
-            return emptyImage;
-        }
-
-        // Capture NavCam image
-        Mat navImage = visionService.getMatNavCamImage();
-        if (navImage != null) {
-            Log.d("LOST_ITEM_SEARCH", "Captured and stored image for position " + lostItemSearchPlane);
-
-            if(Constants.DEBUG_MODE){
-                api.saveMatImage(navImage, "SEARCH_CAPTURE_NAV_"+area+ "_" + System.currentTimeMillis() + ".jpg");
+        try {
+            QuaternionPoint plane = Constants.LOST_ITEM_SEARCH_PLANE_PER_AREA.get(area);
+            if (plane == null) {
+                Log.e("LOST_ITEM_SEARCH", "No plane for " + area);
+                return new Mat();
             }
 
+            boolean moveSuccess = movementService.moveToTargetPosition(
+                    plane.getPoint(), plane.getQuaternion()
+            );
+            if (!moveSuccess) {
+                Log.e("LOST_ITEM_SEARCH", "MoveTo failed for area " + area);
+                return new Mat();
+            }
+
+            Mat navImage = visionService.getMatNavCamImage();
+            if (navImage == null || navImage.empty()) {
+                Log.e("LOST_ITEM_SEARCH", "Captured empty NavCam frame for " + area);
+                return new Mat();
+            }
+
+            if (Constants.DEBUG_MODE) {
+                api.saveMatImage(navImage,
+                        "SEARCH_CAPTURE_NAV_" + area + "_" + System.currentTimeMillis() + ".jpg");
+            }
             return navImage;
-        } else {
-            Log.e("LOST_ITEM_SEARCH", "Failed to capture image for position " + lostItemSearchPlane);
-
-            return emptyImage;
+        }
+        catch (Exception e) {
+            Log.e("LOST_ITEM_SEARCH", "Exception getting NavCam for " + area, e);
+            return new Mat();
         }
     }
 
 
-    public Mat processSearchArea(AreaEnum area, Point position, Quaternion orientation) {
-        Log.d("PROCESS_SEARCH_AREA", "Processing area: " + area);
+    public Mat processSearchArea(AreaEnum area, Point point, Quaternion orientation) {
+        try {
+            boolean moved = movementService.moveToTargetPosition(point, orientation);
+            if (!moved) {
+                Log.e("PROCESS_SEARCH_AREA", "MoveTo failed for " + area + "; continuing anyway");
+            }
 
-        boolean moved = movementService.moveToTargetPosition(position, orientation);
-
-        if (!moved) {
-            Log.e("MOVE", "Failed to move to Area " + area);
+            Mat nav = getLostItemPlaneNavImage(area);
+            return nav != null ? nav : new Mat();
         }
-
-        // Rotate and capture image
-        return getLostItemPlaneNavImage(area);
+        catch (Exception e) {
+            Log.e("PROCESS_SEARCH_AREA", "Unexpected error in " + area, e);
+            return new Mat();
+        }
     }
+
 
 }

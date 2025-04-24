@@ -8,6 +8,7 @@ import org.opencv.calib3d.Calib3d;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfDouble;
+import org.opencv.core.Rect;
 
 import java.util.List;
 
@@ -61,32 +62,52 @@ public class VisionService {
      * @param corners an output parameter that will hold corner positions of detected markers (List<Mat>)
      * @param ids an output Mat that will contain the IDs of detected markers
      */
-    public void readArTag(Mat sourceImage, List<Mat> corners, Mat ids, AreaEnum area) {
-        Log.d("AR_TAG", "Attempting to read arTag from cam image in: " + area);
-
-        Dictionary dict = Aruco.getPredefinedDictionary(Aruco.DICT_5X5_250);
-
-        // undistort the sourceImage for proper arTag corner detection
-        Mat undistortedImage = undistortImage(sourceImage, area);
-
-        try {
-            Aruco.detectMarkers(undistortedImage, dict, corners, ids);
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            undistortedImage.release();
+    public void readArTag(Mat sourceImage,
+                          List<Mat> corners,
+                          Mat ids,
+                          AreaEnum area)
+    {
+        if (sourceImage == null || sourceImage.empty()) {
+            Log.w("AR_TAG", "Empty sourceImage for " + area + "; skipping detect");
+            return;
         }
 
-        if(Constants.DEBUG_MODE){
-            Mat arTagDetectedImage = sourceImage.clone();
-            Aruco.drawDetectedMarkers(arTagDetectedImage, corners, ids);
+        Dictionary dict = Aruco.getPredefinedDictionary(Aruco.DICT_5X5_250);
+        Mat undistorted = null;
+        try {
+            undistorted = undistortImage(sourceImage, area);
+            if (undistorted == null || undistorted.empty()) {
+                Log.w("AR_TAG", "Undistorted image empty for " + area);
+                return;
+            }
 
-            api.saveMatImage(arTagDetectedImage, "AR_IMAGE_" + area + "_" + System.currentTimeMillis() + ".jpg");
+            Aruco.detectMarkers(undistorted, dict, corners, ids);
+        }
+        catch (Exception e) {
+            Log.e("AR_TAG", "detectMarkers failed for " + area, e);
+        }
+        finally {
+            if (undistorted != null) undistorted.release();
+        }
+
+        if (Constants.DEBUG_MODE) {
+            try {
+                Mat debug = sourceImage.clone();
+                if (ids.total() > 0 && !corners.isEmpty()) {
+                    Aruco.drawDetectedMarkers(debug, corners, ids);
+                }
+                api.saveMatImage(debug,
+                        "AR_IMAGE_" + area + "_" + System.currentTimeMillis() + ".jpg");
+                debug.release();
+            }
+            catch (Exception e) {
+                Log.e("AR_TAG", "drawDetectedMarkers or save failed for " + area, e);
+            }
 
             if (ids.total() > 0) {
                 Log.d("AR_TAG", "Detected ArUco IDs: " + ids.dump());
             } else {
-                Log.d("AR_TAG", "No ArUco markers detected");
+                Log.d("AR_TAG", "No ArUco markers detected in " + area);
             }
         }
     }
@@ -148,5 +169,22 @@ public class VisionService {
         }
 
         return undistorted;
+    }
+
+    private Mat cropMatImage(Mat sourceImage, double [] x1Y1, double [] x2Y2){
+        // some slack room
+        x1Y1[0] -= 20;
+        x1Y1[1] -= 20;
+        x2Y2[0] += 20;
+        x2Y2[1] += 20;
+
+        Log.d("CROP_MAT_IMAGE", "x1: "+x1Y1[0]+" y1: "+ x1Y1[1]+" x2: "+x2Y2[0]+" y2: "+x2Y2[1]);
+
+        int cropWidth = (int)x2Y2[0] - (int)x1Y1[0]+1;
+        int cropHeight = (int)x2Y2[1] - (int)x1Y1[1]+1;
+
+        Rect roi = new Rect((int)x1Y1[0], (int)x1Y1[1] , cropWidth, cropHeight);
+
+        return new Mat(sourceImage, roi);
     }
 }
