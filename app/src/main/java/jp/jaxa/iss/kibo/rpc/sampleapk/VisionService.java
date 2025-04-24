@@ -98,7 +98,7 @@ public class VisionService {
 
         if (Constants.DEBUG_MODE) {
             try {
-                Mat debug = sourceImage.clone();
+                Mat debug = undistorted.clone();
                 if (ids.total() > 0 && !corners.isEmpty()) {
                     Aruco.drawDetectedMarkers(debug, corners, ids, new Scalar(0, 255, 0));
                 }
