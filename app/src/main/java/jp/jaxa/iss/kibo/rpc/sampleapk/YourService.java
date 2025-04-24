@@ -20,6 +20,8 @@ import java.util.Map;
 
 /**
  * Class meant to handle commands from the Ground Data System and execute them in Astrobee.
+ * @author Hashib Islam (ihashib)
+ * @since 2025-04-24
  */
 
 public class YourService extends KiboRpcService {

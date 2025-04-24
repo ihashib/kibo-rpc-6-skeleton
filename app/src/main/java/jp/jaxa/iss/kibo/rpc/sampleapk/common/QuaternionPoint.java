@@ -4,6 +4,11 @@ import gov.nasa.arc.astrobee.types.Point;
 import gov.nasa.arc.astrobee.types.Quaternion;
 import jp.jaxa.iss.kibo.rpc.sampleapk.common.enumeration.CartesianDirection;
 
+/**
+ * @author Hashib Islam (ihashib)
+ * @since 2025-04-24
+ */
+
 public class QuaternionPoint {
     private Point point;
     private Quaternion quaternion;

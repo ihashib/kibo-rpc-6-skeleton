@@ -12,6 +12,11 @@ import gov.nasa.arc.astrobee.types.Quaternion;
 import jp.jaxa.iss.kibo.rpc.sampleapk.common.enumeration.AreaEnum;
 import jp.jaxa.iss.kibo.rpc.sampleapk.common.enumeration.CartesianDirection;
 
+/**
+ * @author Hashib Islam (ihashib)
+ * @since 2025-04-24
+ */
+
 public class Constants {
     public static final int MAX_RETRIES = 3;
     public static final int RETRY_WAIT_MS = 500;

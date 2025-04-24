@@ -8,6 +8,11 @@ import gov.nasa.arc.astrobee.types.Quaternion;
 import jp.jaxa.iss.kibo.rpc.api.KiboRpcApi;
 import jp.jaxa.iss.kibo.rpc.sampleapk.common.Constants;
 
+/**
+ * @author Hashib Islam (ihashib)
+ * @since 2025-04-24
+ */
+
 public class MovementService {
     private static final int MAX_RETRIES = 3;
     private static final int RETRY_WAIT_MS = 500;

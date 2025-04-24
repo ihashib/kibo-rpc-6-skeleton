@@ -14,6 +14,11 @@ import jp.jaxa.iss.kibo.rpc.sampleapk.common.Constants;
 import jp.jaxa.iss.kibo.rpc.sampleapk.common.QuaternionPoint;
 import jp.jaxa.iss.kibo.rpc.sampleapk.common.enumeration.AreaEnum;
 
+/**
+ * @author Hashib Islam (ihashib)
+ * @since 2025-04-24
+ */
+
 public class AreaProcessor {
     private final KiboRpcApi api;
     private final MovementService movementService;

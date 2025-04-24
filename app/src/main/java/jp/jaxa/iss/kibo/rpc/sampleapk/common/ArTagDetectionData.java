@@ -4,6 +4,11 @@ import org.opencv.core.Mat;
 
 import java.util.List;
 
+/**
+ * @author Hashib Islam (ihashib)
+ * @since 2025-04-24
+ */
+
 public class ArTagDetectionData {
     private final List<Mat> corners;
     private final Mat ids;
