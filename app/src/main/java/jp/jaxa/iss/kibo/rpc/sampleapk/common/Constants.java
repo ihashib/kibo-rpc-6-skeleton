@@ -79,7 +79,7 @@ public class Constants {
                 {9.866984, -7.34, 4.32,    9.866984, -6.365, 5.57  }   // AREA_4
         };
 
-        Map<AreaEnum, QuaternionPoint> m = new EnumMap<>(AreaEnum.class);
+        Map<AreaEnum, QuaternionPoint> map = new EnumMap<>(AreaEnum.class);
         for (AreaEnum area : AreaEnum.values()) {
             double[] bounds = BOUNDS[area.ordinal()];
             double xMin = bounds[0], yMin = bounds[1], zMin = bounds[2];
@@ -113,8 +113,8 @@ public class Constants {
             // z constant == target orientation
             else if (zMin == zMax) {
                 // face -Z based on rule book
-                orientation = new Quaternion(0f, -0.7071068f, 0f, 0.7071068f);
-                cartesianDirection = CartesianDirection.Z_NEG;
+                orientation = new Quaternion(0f,  0.7071068f, 0f, 0.7071068f);
+                cartesianDirection = CartesianDirection.Z_POS;
             }
             // default
             else {
@@ -122,9 +122,9 @@ public class Constants {
                 cartesianDirection = CartesianDirection.X_POS;
             }
 
-            m.put(area, new QuaternionPoint(center, orientation, cartesianDirection));
+            map.put(area, new QuaternionPoint(center, orientation, cartesianDirection));
         }
 
-        LOST_ITEM_SEARCH_PLANE_PER_AREA = Collections.unmodifiableMap(m);
+        LOST_ITEM_SEARCH_PLANE_PER_AREA = Collections.unmodifiableMap(map);
     }
 }
