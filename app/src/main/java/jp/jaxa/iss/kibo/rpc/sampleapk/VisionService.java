@@ -9,6 +9,7 @@ import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfDouble;
 import org.opencv.core.Rect;
+import org.opencv.core.Scalar;
 
 import java.util.List;
 
@@ -99,7 +100,7 @@ public class VisionService {
             try {
                 Mat debug = sourceImage.clone();
                 if (ids.total() > 0 && !corners.isEmpty()) {
-                    Aruco.drawDetectedMarkers(debug, corners, ids);
+                    Aruco.drawDetectedMarkers(debug, corners, ids, new Scalar(0, 255, 0));
                 }
                 api.saveMatImage(debug,
                         "AR_IMAGE_" + area + "_" + System.currentTimeMillis() + ".jpg");

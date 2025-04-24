@@ -27,7 +27,7 @@ public class Constants {
     public static final Map<AreaEnum, QuaternionPoint> LOST_ITEM_SEARCH_PLANE_PER_AREA;
 
     public static final QuaternionPoint AREA_1_COORDINATES = new QuaternionPoint(
-            new Point(11d, -9.8d, 4.6d),
+            new Point(11d, -9.8d, 4.5d),
             new Quaternion(0f, 0f, -0.707f, 0.707f)
     );
 
