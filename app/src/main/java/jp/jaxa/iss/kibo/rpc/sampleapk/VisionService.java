@@ -12,6 +12,8 @@ import org.opencv.core.MatOfDouble;
 import java.util.List;
 
 import jp.jaxa.iss.kibo.rpc.api.KiboRpcApi;
+import jp.jaxa.iss.kibo.rpc.sampleapk.common.Constants;
+import jp.jaxa.iss.kibo.rpc.sampleapk.common.enumeration.AreaEnum;
 
 public class VisionService {
     private final KiboRpcApi api;
@@ -32,6 +34,8 @@ public class VisionService {
         Log.d("NAV_CAM", "Attempting to take Nav cam image");
 
         for (int attempt = 1; attempt <= Constants.MAX_RETRIES; attempt++) {
+            movementService.wait(Constants.CAM_STABILIZATION_WAIT_MS);
+
             Mat mat = api.getMatNavCam();
 
             if (mat != null && !mat.empty()) {
@@ -57,11 +61,13 @@ public class VisionService {
      * @param corners an output parameter that will hold corner positions of detected markers (List<Mat>)
      * @param ids an output Mat that will contain the IDs of detected markers
      */
-    public void readArTag(Mat sourceImage, List<Mat> corners, Mat ids) {
+    public void readArTag(Mat sourceImage, List<Mat> corners, Mat ids, AreaEnum area) {
+        Log.d("AR_TAG", "Attempting to read arTag from cam image in: " + area);
+
         Dictionary dict = Aruco.getPredefinedDictionary(Aruco.DICT_5X5_250);
 
         // undistort the sourceImage for proper arTag corner detection
-        Mat undistortedImage = undistortImage(sourceImage);
+        Mat undistortedImage = undistortImage(sourceImage, area);
 
         try {
             Aruco.detectMarkers(undistortedImage, dict, corners, ids);
@@ -69,6 +75,19 @@ public class VisionService {
             e.printStackTrace();
         } finally {
             undistortedImage.release();
+        }
+
+        if(Constants.DEBUG_MODE){
+            Mat arTagDetectedImage = sourceImage.clone();
+            Aruco.drawDetectedMarkers(arTagDetectedImage, corners, ids);
+
+            api.saveMatImage(arTagDetectedImage, "AR_IMAGE_" + area + "_" + System.currentTimeMillis() + ".jpg");
+
+            if (ids.total() > 0) {
+                Log.d("AR_TAG", "Detected ArUco IDs: " + ids.dump());
+            } else {
+                Log.d("AR_TAG", "No ArUco markers detected");
+            }
         }
     }
 
@@ -78,7 +97,7 @@ public class VisionService {
      * @param sourceImage the distorted input image (Mat)
      * @return undistorted output image (Mat), or the original image on failure
      */
-    private Mat undistortImage(final Mat sourceImage) {
+    private Mat undistortImage(final Mat sourceImage, AreaEnum area) {
         Log.d("UNDISTORT", "Starting image undistortion");
 
         // Validate input image
@@ -120,8 +139,9 @@ public class VisionService {
             Calib3d.undistort(sourceImage, undistorted, cameraMatrix, distCoeffs);
             Log.d("UNDISTORT", "Image undistorted successfully");
 
-            // save result for debugging
-            api.saveMatImage(undistorted, "undistorted_img.jpg");
+            if(Constants.DEBUG_MODE) {
+                api.saveMatImage(undistorted, "UNDISTORATED_IMG_" + area + "_" + System.currentTimeMillis() + ".jpg");
+            }
         } catch (Exception e) {
             Log.e("UNDISTORT", "Error during undistortion, returning original image", e);
             return sourceImage;

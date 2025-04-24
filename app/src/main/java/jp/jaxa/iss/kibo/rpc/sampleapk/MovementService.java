@@ -6,6 +6,7 @@ import gov.nasa.arc.astrobee.Result;
 import gov.nasa.arc.astrobee.types.Point;
 import gov.nasa.arc.astrobee.types.Quaternion;
 import jp.jaxa.iss.kibo.rpc.api.KiboRpcApi;
+import jp.jaxa.iss.kibo.rpc.sampleapk.common.Constants;
 
 public class MovementService {
     private static final int MAX_RETRIES = 3;
@@ -38,6 +39,8 @@ public class MovementService {
             result = api.moveTo(point, quaternion, true);
 
             if(result.hasSucceeded()){
+                wait(Constants.MOVE_TO_COMPLETE_WAIT_MS);
+
                 return true;
             }
             retryCount++;
