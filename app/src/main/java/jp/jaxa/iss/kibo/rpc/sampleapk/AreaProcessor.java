@@ -4,9 +4,7 @@ import android.util.Log;
 
 import org.opencv.core.Mat;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import gov.nasa.arc.astrobee.types.Point;
@@ -98,9 +96,18 @@ public class AreaProcessor {
                 return new Mat();
             }
 
+            Point currentPosition = api.getRobotKinematics().getPosition();
+
+            if (currentPosition == null) {
+                Log.e("LOST_ITEM_SEARCH", "Failed to get current position");
+                return new Mat();
+            }
+
             boolean moveSuccess = movementService.moveToTargetPosition(
-                    plane.getPoint(), plane.getQuaternion()
+                    currentPosition,
+                    plane.getQuaternion()
             );
+
             if (!moveSuccess) {
                 Log.e("LOST_ITEM_SEARCH", "MoveTo failed for area " + area);
                 return new Mat();
@@ -124,7 +131,15 @@ public class AreaProcessor {
         }
     }
 
-
+    /**
+     * Attempts to move the robot to a given search area and capture its navigation camera image.
+     *
+     * @param area        The logical search area being processed (used for logging and image lookup).
+     * @param point       The 3D coordinates of the target position to move to.
+     * @param orientation The desired orientation (as a quaternion) for the robot at the target position.
+     * @return            The captured NavCam image for the lost-item search plane in this area,
+     *                    or an empty Mat if the move fails, no image is available, or an unexpected error occurs.
+     */
     public Mat processSearchArea(AreaEnum area, Point point, Quaternion orientation) {
         try {
             boolean moved = movementService.moveToTargetPosition(point, orientation);

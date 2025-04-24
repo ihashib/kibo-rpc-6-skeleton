@@ -171,6 +171,17 @@ public class VisionService {
         return undistorted;
     }
 
+    /**
+     * Crops a region of interest (ROI) from the given source image, with an extra padding margin.
+     *
+     * @param sourceImage The original OpenCV Mat image to crop from.
+     * @param x1Y1        A two-element array containing the top-left coordinates [x1, y1] of the desired crop.
+     *                     These values will be adjusted by subtracting padding.
+     * @param x2Y2        A two-element array containing the bottom-right coordinates [x2, y2] of the desired crop.
+     *                     These values will be adjusted by adding padding.
+     * @return            A new Mat representing the cropped region (including padding). If the coordinates
+     *                    go out of bounds you may get an exception—consider clamping to image size if needed.
+     */
     private Mat cropMatImage(Mat sourceImage, double [] x1Y1, double [] x2Y2){
         // some slack room
         x1Y1[0] -= 20;
