@@ -14,8 +14,6 @@ import jp.jaxa.iss.kibo.rpc.sampleapk.common.Constants;
  */
 
 public class MovementService {
-    private static final int MAX_RETRIES = 3;
-    private static final int RETRY_WAIT_MS = 500;
     private final KiboRpcApi api;
 
     public MovementService(KiboRpcApi api) {
@@ -52,8 +50,8 @@ public class MovementService {
 
             Log.d("MOVE","Move attempt :" + retryCount);
 
-            wait(RETRY_WAIT_MS);
-        } while(!result.hasSucceeded() && retryCount < MAX_RETRIES);
+            wait(Constants.RETRY_WAIT_MS);
+        } while(!result.hasSucceeded() && retryCount < Constants.MAX_RETRIES);
 
         Log.d("MOVE", "Move to target failed");
         return false;
