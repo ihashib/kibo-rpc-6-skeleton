@@ -9,7 +9,7 @@ import jp.jaxa.iss.kibo.rpc.api.KiboRpcApi;
 import jp.jaxa.iss.kibo.rpc.sampleapk.common.Constants;
 
 /**
- * @author Hashib Islam (ihashib)
+ * @author Hashib Islam (#)
  * @since 2025-04-24
  */
 

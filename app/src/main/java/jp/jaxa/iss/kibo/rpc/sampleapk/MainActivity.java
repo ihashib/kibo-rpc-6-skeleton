@@ -4,7 +4,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 /**
- * @author Hashib Islam (ihashib)
+ * @author Hashib Islam (#)
  * @since 2025-04-24
  */
 

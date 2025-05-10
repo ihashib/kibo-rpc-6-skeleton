@@ -5,7 +5,7 @@ import org.opencv.core.Mat;
 import java.util.List;
 
 /**
- * @author Hashib Islam (ihashib)
+ * @author Hashib Islam (#)
  * @since 2025-04-24
  */
 

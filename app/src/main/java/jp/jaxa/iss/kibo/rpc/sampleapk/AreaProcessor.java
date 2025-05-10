@@ -15,7 +15,7 @@ import jp.jaxa.iss.kibo.rpc.sampleapk.common.QuaternionPoint;
 import jp.jaxa.iss.kibo.rpc.sampleapk.common.enumeration.AreaEnum;
 
 /**
- * @author Hashib Islam (ihashib)
+ * @author Hashib Islam (#)
  * @since 2025-04-24
  */
 

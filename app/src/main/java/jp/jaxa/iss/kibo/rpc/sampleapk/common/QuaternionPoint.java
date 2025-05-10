@@ -5,7 +5,7 @@ import gov.nasa.arc.astrobee.types.Quaternion;
 import jp.jaxa.iss.kibo.rpc.sampleapk.common.enumeration.CartesianDirection;
 
 /**
- * @author Hashib Islam (ihashib)
+ * @author Hashib Islam (#)
  * @since 2025-04-24
  */
 
